@@ -1,6 +1,10 @@
 from Queue import Queue
 
 
+class BreakError(Exception):
+    pass
+
+
 class TreeNode:
     def __init__(self, val):
         self.right = None
@@ -46,6 +50,9 @@ class BinaryTree:
         print(root)
 
     def levelOrderTraversal(self, root):
+        self.__levelOrderTraversalFunction__(root, print)
+
+    def __levelOrderTraversalFunction__(self, root, f):
         q = Queue()
         q.createQueue()
         q.enqueque(root)
@@ -55,9 +62,12 @@ class BinaryTree:
             if q.peek().right:
                 q.enqueque(q.peek().right)
             try:
-                print(q.dequeue())
+                f(q.dequeue())
             except ValueError:
                 continue
+            except BreakError:
+                return True
+        return False
 
     def search(self, value):
         if self.root is None:
@@ -68,19 +78,12 @@ class BinaryTree:
             print("Found "+str(value))
             return
 
-        q = Queue()
-        q.createQueue()
-        q.enqueque(self.root)
-        while not q.isEmpty():
-            if q.peek().left:
-                q.enqueque(q.peek().left)
-            if q.peek().right:
-                q.enqueque(q.peek().right)
-            try:
-                val = q.dequeue()
-                if val.value == value:
-                    print("Found " + str(value))
-                    return
-            except ValueError:
-                continue
-        print(str(value)+" not found!")
+        def checkVal(mVal):
+            val = mVal
+            if val.value == value:
+                print("Found " + str(value))
+                raise BreakError
+
+        found = self.__levelOrderTraversalFunction__(self.root, checkVal)
+        if not found:
+            print(str(value)+" not found!")
