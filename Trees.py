@@ -58,3 +58,29 @@ class BinaryTree:
                 print(q.dequeue())
             except ValueError:
                 continue
+
+    def search(self, value):
+        if self.root is None:
+            print("Empty Tree")
+            return
+
+        if value == self.root.value:
+            print("Found "+str(value))
+            return
+
+        q = Queue()
+        q.createQueue()
+        q.enqueque(self.root)
+        while not q.isEmpty():
+            if q.peek().left:
+                q.enqueque(q.peek().left)
+            if q.peek().right:
+                q.enqueque(q.peek().right)
+            try:
+                val = q.dequeue()
+                if val.value == value:
+                    print("Found " + str(value))
+                    return
+            except ValueError:
+                continue
+        print(str(value)+" not found!")
