@@ -87,3 +87,18 @@ class BinaryTree:
         found = self.__levelOrderTraversalFunction__(self.root, checkVal)
         if not found:
             print(str(value)+" not found!")
+
+    def insert(self, value):
+        if self.root is None:
+            self.root = TreeNode(value)
+            return True
+        else:
+            def leftInsert(node):
+                if node.left is None:
+                    node.left = TreeNode(value)
+                    raise BreakError
+                elif node.right is None:
+                    node.right = TreeNode(value)
+                    raise BreakError
+
+            return self.__levelOrderTraversalFunction__(self.root, leftInsert)
