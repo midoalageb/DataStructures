@@ -62,10 +62,13 @@ class BinaryTree:
             if q.peek().right:
                 q.enqueque(q.peek().right)
             try:
-                f(q.dequeue())
+                tmp = q.dequeue()
+                f(tmp)
             except ValueError:
                 continue
             except BreakError:
+                if tmp:
+                    return tmp
                 return True
         return False
 
@@ -76,7 +79,7 @@ class BinaryTree:
 
         if value == self.root.value:
             print("Found "+str(value))
-            return
+            return self.root
 
         def checkVal(mVal):
             val = mVal
@@ -87,6 +90,8 @@ class BinaryTree:
         found = self.__levelOrderTraversalFunction__(self.root, checkVal)
         if not found:
             print(str(value)+" not found!")
+        else:
+            return found
 
     def insert(self, value):
         if self.root is None:
@@ -102,3 +107,56 @@ class BinaryTree:
                     raise BreakError
 
             return self.__levelOrderTraversalFunction__(self.root, leftInsert)
+
+    def findDeepestNode(self):
+        q = Queue()
+        q.createQueue()
+        q.enqueque(self.root)
+        while not q.isEmpty():
+            if q.peek().left:
+                q.enqueque(q.peek().left)
+            if q.peek().right:
+                q.enqueque(q.peek().right)
+            try:
+                tmp = q.dequeue()
+            except ValueError:
+                continue
+        return tmp
+
+    def delete(self, value):
+        tmp = self.search(value)
+        if not tmp:
+            print(str(value) + " not found!")
+            return
+
+        moved = self.findDeepestNode()
+        print(moved)
+
+        moved.left = tmp.left
+        moved.right = tmp.right
+
+        def findFirstLeafParent(val):
+            if val.left == moved:
+                val.left = None
+                raise BreakError
+            elif val.right == moved:
+                val.right = None
+                raise BreakError
+
+        def replaceDeleted(val):
+            print(val)
+            if val.left == tmp:
+                val.left = moved
+                raise BreakError
+            elif val.right == tmp:
+                val.right = moved
+                raise BreakError
+
+        if self.__levelOrderTraversalFunction__(self.root, findFirstLeafParent):
+            if self.root == tmp:
+                self.root = moved
+                if self.__levelOrderTraversalFunction__(self.root, replaceDeleted):
+                    return True
+            else:
+                return self.__levelOrderTraversalFunction__(self.root, replaceDeleted)
+        return False
